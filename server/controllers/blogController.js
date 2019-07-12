@@ -25,6 +25,29 @@ export default class BlogController {
     } catch (error) { next(error) }
   }
 
+  async getBlogBySlug(req, res, next) {
+    try {
+      if (!req.query.slug) {
+        return next()
+      }
+      let blog = await _blogService.findOne({ slug: req.query.slug })
+      if (!blog) {
+        return res.status(400).send("No blog by that slug")
+      }
+      res.send(blog)
+    } catch (error) { next(error) }
+  }
+
+  async getBlogsByTags(req, res, next) {
+    try {
+      if (!req.query.tags) {
+        return next()
+      }
+      let blogs = await _blogService.find({ tags: { $in: [req.query.tags] } })
+      res.send(blogs)
+    } catch (error) { next(error) }
+  }
+
   async createBlog(req, res, next) {
     try {
       let blog = await _blogService.create(req.body)
@@ -49,11 +72,23 @@ export default class BlogController {
   constructor() {
     this.router = express.Router()
       .get('', this.getAllBlogs)
+      // Retrieve blogs by query for title(slug) (.get findOne()) ANCHOR 
+      .get('', this.getBlogBySlug)
+      // Retrieve all blogs by query for a tag (.get by find()) ANCHOR  
+      .get('', this.getBlogsByTags)
       .get('/:blogId', this.getBlog)
       .post('', this.createBlog)
       .put('/:blogId', this.editBlog)
       .delete('/:blogId', this.deleteBlog)
   }
+
+  // Retrieve all blogs (.get) ANCHOR 
+  // Retrieve blogs by query for title(slug) (.get findOne()) ANCHOR 
+  // Retrieve all blogs by query for a tag (.get by find()) ANCHOR  
+  // Post a blog ANCHOR 
+  // Retrieve a blog by id  (.get) ANCHOR 
+  // Edit a blog (.put) ANCHOR 
+  // Delete a blog (.delete) ANCHOR 
 
 
 }
