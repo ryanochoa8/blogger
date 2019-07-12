@@ -11,6 +11,7 @@ let server = express()
 server.use(bp.json({ limit: '50mb' }))
 
 server.use('/api/blogs', new BlogController().router)
+server.use('/', express.static(__dirname + '/../public'))
 
 server.use((error, req, res, next) => {
   res.status(error.status || 400).send(error)
