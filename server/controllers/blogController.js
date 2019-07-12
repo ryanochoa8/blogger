@@ -6,25 +6,6 @@ import { networkInterfaces } from 'os';
 
 export default class BlogController {
 
-  async getAllBlogs(req, res, next) {
-    try {
-      let Blogs = await _blogService.find()
-      res.send(Blogs)
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  async getBlog(req, res, next) {
-    try {
-      let blog = await _blogService.findById(req.params.blogId)
-      if (!blog) {
-        return res.status(400).send("This is no the Blog you are looking for...")
-      }
-      res.send(blog)
-    } catch (error) { next(error) }
-  }
-
   async getBlogBySlug(req, res, next) {
     try {
       if (!req.query.slug) {
@@ -48,6 +29,24 @@ export default class BlogController {
     } catch (error) { next(error) }
   }
 
+  async getBlog(req, res, next) {
+    try {
+      let blog = await _blogService.findById(req.params.blogId)
+      if (!blog) {
+        return res.status(400).send("This is no the Blog you are looking for...")
+      }
+      res.send(blog)
+    } catch (error) { next(error) }
+  }
+
+  async getAllBlogs(req, res, next) {
+    try {
+      let Blogs = await _blogService.find()
+      res.send(Blogs)
+    } catch (error) {
+      next(error)
+    }
+  }
   async createBlog(req, res, next) {
     try {
       let blog = await _blogService.create(req.body)
@@ -57,7 +56,7 @@ export default class BlogController {
 
   async editBlog(req, res, next) {
     try {
-      let editedBlog = await _blogService.findByIdAndUpdate(req.params.planetId, req.body, { new: true })
+      let editedBlog = await _blogService.findByIdAndUpdate(req.params.blogId, req.body, { new: true })
       res.send(editedBlog)
     } catch (error) { next(error) }
   }
@@ -71,12 +70,12 @@ export default class BlogController {
 
   constructor() {
     this.router = express.Router()
-      .get('', this.getAllBlogs)
       // Retrieve blogs by query for title(slug) (.get findOne()) ANCHOR 
       .get('', this.getBlogBySlug)
       // Retrieve all blogs by query for a tag (.get by find()) ANCHOR  
       .get('', this.getBlogsByTags)
       .get('/:blogId', this.getBlog)
+      .get('', this.getAllBlogs)
       .post('', this.createBlog)
       .put('/:blogId', this.editBlog)
       .delete('/:blogId', this.deleteBlog)
